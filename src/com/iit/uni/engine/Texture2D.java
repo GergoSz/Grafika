@@ -1,12 +1,12 @@
 package com.iit.uni.engine;
 
+import static org.lwjgl.opengl.GL11.GL_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_RGBA;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
 import static org.lwjgl.opengl.GL11.GL_UNPACK_ALIGNMENT;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
-import static org.lwjgl.opengl.GL11.GL_NEAREST;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL11.glGenTextures;
@@ -27,11 +27,14 @@ import com.iit.uni.engine.graph.Mesh;
 import com.iit.uni.engine.graph.PNGDecoder;
 import com.iit.uni.engine.graph.PNGDecoder.Format;
 import com.iit.uni.engine.math.Vector2D;
+import com.iit.uni.game.Renderer;
 
 /**
  * Texture 2D Class
  * 
  * @author Mileff Peter
+ * 
+ *         University of Miskolc
  *
  */
 public class Texture2D {
@@ -60,6 +63,8 @@ public class Texture2D {
 	// Matrix for transformation
 	private Matrix4f mTranformation;
 
+	private int mID;
+
 	public Texture2D() {
 		textureID = -1;
 		scale = 1;
@@ -70,6 +75,8 @@ public class Texture2D {
 		rotation = new Vector3f(0, 0, 0);
 
 		mTranformation = new Matrix4f();
+
+		mID = -1;
 	}
 
 	public void bind() {
@@ -106,7 +113,9 @@ public class Texture2D {
 	}
 
 	private void loadTexture(String fileName) throws Exception {
+
 		// Load Texture file
+		System.out.println("Loading file: " + fileName);
 
 		File initialFile = new File(fileName);
 		InputStream targetStream = new FileInputStream(initialFile);
@@ -206,20 +215,48 @@ public class Texture2D {
 		mesh.render();
 	}
 
+	public void Draw() {
+
+		Renderer.mRenderer.shaderProgram.bind();
+
+		Renderer.mRenderer.shaderProgram.setUniform("projectionMatrix", Renderer.mRenderer.projectionMatrix);
+		Renderer.mRenderer.shaderProgram.setUniform("texture_sampler", 0);
+
+		Matrix4f worldMatrix = getWorldMatrix();
+		Renderer.mRenderer.shaderProgram.setUniform("worldMatrix", worldMatrix);
+
+		// Draw the texture
+		mesh.render();
+		//mesh.cleanUp();
+
+		Renderer.mRenderer.shaderProgram.unbind();
+	}
+
+	/**
+	 * Draw the texture
+	 * 
+	 * @param pos
+	 */
 	public void Draw(Vector2D pos) {
 
 		position.x = pos.x;
 		position.y = pos.y;
 
-		mesh.render();
+		Draw();
 	}
 
+	/**
+	 * Draw the texture
+	 * 
+	 * @param x
+	 * @param y
+	 */
 	public void Draw(float x, float y) {
 
 		position.x = x;
 		position.y = y;
 
-		mesh.render();
+		Draw();
 	}
 
 	public float GetWidth() {
@@ -232,5 +269,13 @@ public class Texture2D {
 
 	public Mesh getMesh() {
 		return mesh;
+	}
+
+	public int GetID() {
+		return mID;
+	}
+
+	public void SetID(int id) {
+		mID = id;
 	}
 }

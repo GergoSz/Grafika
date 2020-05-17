@@ -31,8 +31,10 @@ import com.iit.uni.game.Renderer;
  * Describes an AABB 2D bounding box
  * 
  * @author Mileff Peter
+ * 
+ *         University of Miskolc
  *
- ***********************************/
+ */
 public class BoundingBox2D {
 
 	private final int AABB_POINTS_2D = 4;
@@ -275,27 +277,27 @@ public class BoundingBox2D {
 		glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
 
 		// Activate shader
-		Renderer.lineShader.bind();
-		Renderer.lineShader.setUniform("projectionMatrix", Renderer.projectionMatrix);
+		Renderer.mRenderer.lineShader.bind();
+		Renderer.mRenderer.lineShader.setUniform("projectionMatrix", Renderer.mRenderer.projectionMatrix);
 
 		// Set world/model matrix for this item
 		Matrix4f modelMatrix = new Matrix4f();
-		Renderer.lineShader.setUniform("modelMatrix", modelMatrix);
+		Renderer.mRenderer.lineShader.setUniform("modelMatrix", modelMatrix);
 
 		// Set color
-		Renderer.lineShader.setUniform4f("linecolor", 0.8f, 0.4f, 0.4f, 1.0f);
+		Renderer.mRenderer.lineShader.setUniform4f("linecolor", 0.8f, 0.4f, 0.4f, 1.0f);
 
 		// Render the VAO
 		glBindVertexArray(vaoId);
 		glEnableVertexAttribArray(0);
 
-		glDisable(GL_DEPTH_TEST);
+		//glDisable(GL_DEPTH_TEST);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
-		glEnable(GL_DEPTH_TEST);
+		//glEnable(GL_DEPTH_TEST);
 		// Restore state
 		glDisableVertexAttribArray(0);
 
-		Renderer.lineShader.unbind();
+		Renderer.mRenderer.lineShader.unbind();
 	}
 
 	///

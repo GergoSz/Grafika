@@ -11,7 +11,9 @@ import com.iit.uni.engine.math.Vector2D;
  * 
  * @author Mileff Peter
  * 
- */
+ *         University of Miskolc
+ *
+ ******************************************************************************/
 public class CSprite {
 
 	// Frames vector
@@ -46,16 +48,21 @@ public class CSprite {
 	public CSprite(String filenames, int numOfFrames, float X, float Y) {
 		m_iActualFrame = 0;
 		m_iLastUpdate = System.currentTimeMillis();
-		m_iFps = 10; // default FPS animation rate
+		m_iFps = 15; // default FPS animation rate
 		m_vFrames = new ArrayList<CSpriteFrame>();
-
+		m_vFrames.clear();
 		/** Loading textures */
 		LoadTextures(filenames, numOfFrames);
 
 		m_vSpritePosition = new Vector2D(X, Y);
 	}
 
-	/** Loads sprite textures */
+	/**
+	 * Loads sprite textures
+	 * 
+	 * @param filenames
+	 * @param numOfFrames
+	 */
 	public void LoadTextures(String filenames, int numOfFrames) {
 
 		if (numOfFrames == 1) {
@@ -101,17 +108,16 @@ public class CSprite {
 		BoundingBox2D original = currentFrame.GetOriginalBB();
 		BoundingBox2D transformed = currentFrame.GetTransformedBB();
 
-		//fucked the basic transforms pls fix (dont code shitfaced)
-		transformed.SetPoints(original.GetMinPoint(), original.GetMaxPoint());
-		transformed.transformByRotate(0, 0, 0, 1);
-		transformed.transformByScale(new Vector2D(1f, 2.4f));
-		transformed.transformByTranslate(new Vector2D(m_vSpritePosition.x, m_vSpritePosition.y -24));
+		//transformed.SetPoints(original.GetMinPoint(), original.GetMaxPoint());
+		//transformed.transformByRotate(0, 0, 0, 1);
+		//transformed.transformByScale(new Vector2D(1, 1));
+		//transformed.transformByTranslate(new Vector2D(m_vSpritePosition.x, m_vSpritePosition.y));
 
 		return transformed;
 	}
 
 	/** Draw Animated Sprite */
-	public void Draw(Vector2D pos) {
+	public void Draw(Vector2D pos) {	
 		Texture2D tex = m_vFrames.get(m_iActualFrame).GetTexture();
 		tex.Draw(pos);
 		Update();

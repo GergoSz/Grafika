@@ -4,9 +4,14 @@ import java.util.ArrayList;
 
 import com.iit.uni.engine.math.Vector2D;
 
-///
-/// 2D Game Object class
-///
+/**
+ * 2D Game Object class
+ * 
+ * @author Mileff Peter
+ * 
+ *         University of Miskolc
+ *
+ */
 public class GameObject2D {
 
 	private boolean mVisible;
@@ -14,7 +19,7 @@ public class GameObject2D {
 	private int mID;
 
 	// Entity Name
-	private String mName;
+	private String mName = "";
 
 	private Vector2D m_vPosition; // Position of the object
 	private Vector2D m_vDirection; // Direction of the movement
@@ -58,7 +63,7 @@ public class GameObject2D {
 	/// Init GameObject and Load animations
 	///
 	public GameObject2D(String spriteFilename, int numOfFrames, int ID) {
-		
+
 		CSprite sprite = new CSprite(spriteFilename, numOfFrames, 0.0f, 0.0f);
 		m_Animations = new ArrayList<CSprite>();
 		m_Animations.add(sprite);
@@ -125,6 +130,10 @@ public class GameObject2D {
 	///
 	public void SetPosition(Vector2D pos) {
 		m_vPosition.set(pos.x, pos.y);
+		
+		for (int i = 0; i < m_uiNumberOfFrames; ++i) {
+			m_Animations.get(i).SetPosition(pos.x,pos.y);
+		}
 	}
 
 	///
@@ -132,6 +141,10 @@ public class GameObject2D {
 	///
 	public void SetPosition(float x, float y) {
 		m_vPosition.set(x, y);
+		
+		for (int i = 0; i < m_uiNumberOfFrames; ++i) {
+			m_Animations.get(i).SetPosition(x,y);
+		}
 	}
 
 	///
@@ -177,6 +190,7 @@ public class GameObject2D {
 			if (mVisible == true) {
 				// Draw the current frame
 				m_Animations.get(m_uiCurrentAnim).Draw(m_vPosition);
+				//m_Animations.get(m_uiCurrentAnim).getCurrentFrameTransformedBoundingBox().Draw();
 			}
 		}
 	}
@@ -345,4 +359,21 @@ public class GameObject2D {
 			m_Animations.get(i).cleanUp();
 		}
 	}
+
+	public int GetID() {
+		return mID;
+	}
+
+	public void SetID(int id) {
+		mID = id;
+	}
+
+	public String GetName() {
+		return mName;
+	}
+
+	public void SetName(String name) {
+		mName = name;
+	}
+
 }

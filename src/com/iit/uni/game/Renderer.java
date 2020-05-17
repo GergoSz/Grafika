@@ -7,8 +7,6 @@ import static org.lwjgl.opengl.GL11.glViewport;
 
 import org.joml.Matrix4f;
 
-import com.iit.uni.engine.CSprite;
-import com.iit.uni.engine.GameObject2D;
 import com.iit.uni.engine.Utils;
 import com.iit.uni.engine.Window;
 import com.iit.uni.engine.graph.ShaderProgram;
@@ -24,20 +22,23 @@ public class Renderer {
 
 	private final Transformation transformation;
 
-	private ShaderProgram shaderProgram;
-	
+	public ShaderProgram shaderProgram;
+
 	// Our line drawing shader
-	public static ShaderProgram lineShader;
-	
+	public ShaderProgram lineShader;
+
 	// Orthogonal projection Matrix
-	public static Matrix4f projectionMatrix;
-	
+	public Matrix4f projectionMatrix;
+
+	public static Renderer mRenderer;
 
 	public Renderer() {
 		transformation = new Transformation();
 	}
 
 	public void init(Window window) throws Exception {
+
+		mRenderer = this;
 
 		// Create shader
 		shaderProgram = new ShaderProgram();
@@ -49,7 +50,7 @@ public class Renderer {
 		shaderProgram.createUniform("projectionMatrix");
 		shaderProgram.createUniform("worldMatrix");
 		shaderProgram.createUniform("texture_sampler");
-		
+
 		lineShader = new ShaderProgram();
 		lineShader.createVertexShader(Utils.loadFile("shaders/line.vs"));
 		lineShader.createFragmentShader(Utils.loadFile("shaders/line.fs"));
@@ -59,7 +60,7 @@ public class Renderer {
 		lineShader.createUniform("projectionMatrix");
 		lineShader.createUniform("modelMatrix");
 		lineShader.createUniform("linecolor");
-		
+
 		// Update orthogonal projection Matrix
 		projectionMatrix = transformation.getOrthoProjectionMatrix(0, window.getWidth(), window.getHeight(), 0);
 	}
@@ -68,7 +69,7 @@ public class Renderer {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	public void render(Window window, GameObject2D gameObject) {
+	public void render(Window window) {
 		clear();
 
 		if (window.isResized()) {
@@ -76,23 +77,8 @@ public class Renderer {
 			window.setResized(false);
 		}
 
-		shaderProgram.bind();
-
-		shaderProgram.setUniform("projectionMatrix", projectionMatrix);
-		shaderProgram.setUniform("texture_sampler", 0);
-
-		// Render each gameItem
-
-		Matrix4f worldMatrix = gameObject.GetCurrentFrame().GetCurrentFrameTextureWorldMatrix();
-		shaderProgram.setUniform("worldMatrix", worldMatrix);
-
 		// Render the sprite
-		gameObject.Draw();
-
-		shaderProgram.unbind();
-		
-		// Render bounding box
-		gameObject.GetCurrentFrame().getCurrentFrameTransformedBoundingBox().Draw();
+		DummyGame.sceneManager.Render();
 	}
 
 	public void cleanup() {

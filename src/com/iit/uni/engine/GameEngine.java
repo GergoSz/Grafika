@@ -4,11 +4,13 @@ package com.iit.uni.engine;
  * Simple Class for representing engine functions
  * 
  * @author Mileff Peter
+ * 
+ *         University of Miskolc
  *
  */
 public class GameEngine implements Runnable {
 
-	public static final int TARGET_FPS = 75;
+	public static final int TARGET_FPS = 575;
 
 	public static final int TARGET_UPS = 30;
 
@@ -58,7 +60,8 @@ public class GameEngine implements Runnable {
 		float elapsedTime;
 		float accumulator = 0f;
 		float interval = 1f / TARGET_UPS;
-
+		
+		int FPS = 0;
 		boolean running = true;
 
 		while (running && !window.windowShouldClose()) {
@@ -72,6 +75,7 @@ public class GameEngine implements Runnable {
 				accumulator -= interval;
 			}
 
+			FPS++;
 			render();
 
 			if (!window.isvSync()) {

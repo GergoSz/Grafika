@@ -6,6 +6,8 @@ import com.iit.uni.engine.math.Vector2D;
  * Frame of a Sprite Animation
  * 
  * @author Mileff Peter
+ * 
+ *         University of Miskolc
  *
  */
 public class CSpriteFrame {
@@ -47,10 +49,10 @@ public class CSpriteFrame {
 	public void AddBoundingBox(Vector2D minpoint, Vector2D maxPoint) {
 
 		// Create new Bounding Box
-		mBBoxOriginal = new BoundingBox2D(minpoint, maxPoint);
+		//mBBoxOriginal = new BoundingBox2D(minpoint, maxPoint);
 
 		// One for transformed Box
-		mBBoxTransformed = new BoundingBox2D(minpoint, maxPoint);
+		//mBBoxTransformed = new BoundingBox2D(minpoint, maxPoint);
 	}
 
 	///
