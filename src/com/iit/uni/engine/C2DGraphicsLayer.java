@@ -1,6 +1,8 @@
 package com.iit.uni.engine;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Class for representing a 2D Layer
@@ -183,12 +185,10 @@ public class C2DGraphicsLayer {
 			obj.Draw();
 		}
 	}
-
-	///
-	/// Sort objects by Z index
-	///
+	
 	public void SortByZIndex() {
-
+		Comparator<GameObject2D> compareByzIndex = Comparator.comparing(GameObject2D::GetZIndex);
+		Collections.sort(mObjectList, compareByzIndex);
 	}
 
 	///

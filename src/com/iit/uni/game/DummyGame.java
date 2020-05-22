@@ -19,7 +19,7 @@ import com.iit.uni.engine.math.Vector2D;
 public class DummyGame implements IGameLogic {
 
 	private final Renderer renderer;
-	private int direction = 0;
+	private String direction = "none";
 
 	// 2D GameObject items
 	private GameObject2D gameItem;
@@ -49,19 +49,27 @@ public class DummyGame implements IGameLogic {
 
 		CSprite frameRunRight = new CSprite("textures2/Right_", 5, 200, 200);
 		CSprite frameRunLeft = new CSprite("textures2/Left_", 5, 200, 200);
-		CSprite idle = new CSprite("textures2/Down_1", 1, 200, 200);
+		CSprite idleD = new CSprite("textures2/Down_1", 1, 200, 200);
+		CSprite idleU = new CSprite("textures2/Up_1", 1, 200, 200);
+		CSprite idleR = new CSprite("textures2/Right_1", 1, 200, 200);
+		CSprite idleL = new CSprite("textures2/Left_1", 1, 200, 200);
 		CSprite frameRunUp = new CSprite("textures2/Up_", 5, 200, 200);
 		CSprite frameRunDown = new CSprite("textures2/Down_", 5, 200, 200);
+		CSprite frameAttackDown = new CSprite("textures2/ADown_", 5, 200, 200);
 
-		dummy.AddFrame(idle);
+		dummy.AddFrame(idleD);
 		dummy.SetScale(2.6f);
 		dummy.SetPosition(700, 500);
 
-		gameItem.AddFrame(idle);
+		gameItem.AddFrame(idleD);
 		gameItem.AddFrame(frameRunRight);
 		gameItem.AddFrame(frameRunLeft);
 		gameItem.AddFrame(frameRunUp);
 		gameItem.AddFrame(frameRunDown);
+		gameItem.AddFrame(frameAttackDown);
+		gameItem.AddFrame(idleU);
+		gameItem.AddFrame(idleR);
+		gameItem.AddFrame(idleL);
 		
 		gameItem.SetScale(2.6f);
 		gameItem.SetSpeed(2.5f);
@@ -109,7 +117,9 @@ public class DummyGame implements IGameLogic {
 		C2DGraphicsLayer layer4 = new C2DGraphicsLayer();
 		layer4.AddTexture(ground);
 */
+		
 		C2DGraphicsLayer playerLayer = new C2DGraphicsLayer();
+		C2DGraphicsLayer dummyLayer= new C2DGraphicsLayer();
 		playerLayer.AddGameObject(gameItem);
 		playerLayer.AddGameObject(dummy);
 		
@@ -119,72 +129,76 @@ public class DummyGame implements IGameLogic {
 		/*scene.RegisterLayer(layer2);
 		scene.RegisterLayer(layer3);
 		scene.RegisterLayer(layer4);*/
-		scene.RegisterLayer(playerLayer);
 
+		scene.RegisterLayer(dummyLayer);
+		scene.RegisterLayer(playerLayer);
+		
 		// Register scene at the manager
 		sceneManager.RegisterScene(scene);
+		
 	}
 
 	@Override
 	public void input(Window window) {
-		
+		/*if(window.isKeyPressed('W') || window.isKeyPressed('A') || window.isKeyPressed('S') || window.isKeyPressed('D')) {
+			
+		}else {
+			
+		}*/
+		gameItem.SetCurrentFrame(0);
 		if (window.isKeyPressed('S')) {
+			direction = "S";
 			Vector2D pos = gameItem.GetPosition();
 			gameItem.SetCurrentFrame(4);
 			pos.y += gameItem.GetSpeed();
 			gameItem.SetPosition(pos);
-		} else if (window.isKeyPressed('A')) {
-			direction = -1;
+		}else
+		if (window.isKeyPressed('A')) {
+			direction = "A";
 			gameItem.SetCurrentFrame(2);
 			Vector2D pos = gameItem.GetPosition();
 			pos.x -= gameItem.GetSpeed();
 			gameItem.SetPosition(pos);
-		} else if (window.isKeyPressed('D')) {
-			direction = 1;
+		}else
+		if (window.isKeyPressed('D')) {
+			direction = "D";
 			gameItem.SetCurrentFrame(1);
 			Vector2D pos = gameItem.GetPosition();
 			//if(pos.x < 300)
 				pos.x += gameItem.GetSpeed();
 			System.out.println(pos.x);
 			gameItem.SetPosition(pos);
-		} else if (window.isKeyPressed('W')) {
+		}else
+		if (window.isKeyPressed('W')) {
+			direction = "W";
 			Vector2D pos = gameItem.GetPosition();
 			gameItem.SetCurrentFrame(3);
 			pos.y -= gameItem.GetSpeed();
 			gameItem.SetPosition(pos);
-		}else{
-			gameItem.SetCurrentFrame(0);
+		}else {
+			switch (direction) {
+			case "W":
+				gameItem.SetCurrentFrame(6);
+				break;
+			case "S":
+				gameItem.SetCurrentFrame(0);
+				break;
+			case "A":
+				gameItem.SetCurrentFrame(8);
+				break;
+			case "D":
+				gameItem.SetCurrentFrame(7);
+				break;
+			}
+		}
+		
+				
+		
+		if(window.isKeyPressed(' ')) {
+			gameItem.SetCurrentFrame(5);
 		}
 
-		/*if (window.isKeyPressed(GLFW_KEY_UP)) {
-
-			if (direction == 1) {
-				gameItem.SetCurrentFrame(3);
-			} else {
-				gameItem.SetCurrentFrame(4);
-			}
-			Vector2D pos = gameItem.GetPosition();
-			pos.y -= 5;
-			gameItem.SetPosition(pos);
-
-		} else if (window.isKeyPressed(GLFW_KEY_DOWN)) {
-			Vector2D pos = gameItem.GetPosition();
-			pos.y += 5;
-			gameItem.SetPosition(pos);
-
-		} else if (window.isKeyPressed(GLFW_KEY_LEFT)) {
-			direction = -1;
-			gameItem.SetCurrentFrame(2);
-			Vector2D pos = gameItem.GetPosition();
-			pos.x -= 5;
-			gameItem.SetPosition(pos);
-		} else if (window.isKeyPressed(GLFW_KEY_RIGHT)) {
-			direction = 1;
-			gameItem.SetCurrentFrame(1);
-			Vector2D pos = gameItem.GetPosition();
-			pos.x += 5;
-			gameItem.SetPosition(pos);
-		}*/
+		
 	}
 
 	@Override

@@ -62,6 +62,7 @@ public class C2DScene {
 			return;
 
 		for (int i = 0; i < mLayers.size(); i++) {
+			mLayers.get(i).SortByZIndex();
 			// Reset collision flag
 			mLayers.get(i).Render();
 		}

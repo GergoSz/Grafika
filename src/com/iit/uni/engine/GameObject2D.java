@@ -186,6 +186,9 @@ public class GameObject2D {
 	/// Draw frames. Loop animation.
 	///
 	public void Draw() {
+		
+		SetZIndex((int)m_vPosition.y);
+		
 		if (m_uiNumberOfFrames > 0) {
 			if (mVisible == true) {
 				// Draw the current frame

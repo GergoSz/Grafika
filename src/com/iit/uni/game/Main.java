@@ -9,7 +9,7 @@ import com.iit.uni.engine.IGameLogic;
  * @author Mileff Peter
  *
  */
-public class GameObjectTutorial {
+public class Main {
 
 	public static void main(String[] args) {
 		try {
