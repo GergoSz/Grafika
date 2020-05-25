@@ -3,9 +3,11 @@ package com.iit.uni.game;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glViewport;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import com.iit.uni.engine.Utils;
 import com.iit.uni.engine.Window;
@@ -31,6 +33,8 @@ public class Renderer {
 	public Matrix4f projectionMatrix;
 
 	public static Renderer mRenderer;
+	
+	//private Player p;
 
 	public Renderer() {
 		transformation = new Transformation();
@@ -63,6 +67,8 @@ public class Renderer {
 
 		// Update orthogonal projection Matrix
 		projectionMatrix = transformation.getOrthoProjectionMatrix(0, window.getWidth(), window.getHeight(), 0);
+		//p = Player.getInstance();
+		
 	}
 
 	public void clear() {
@@ -76,7 +82,10 @@ public class Renderer {
 			glViewport(0, 0, window.getWidth(), window.getHeight());
 			window.setResized(false);
 		}
-
+		
+		//projectionMatrix.translate(new Vector3f(p.GetPosition().x,p.GetPosition().y,0));
+		//projectionMatrix = transformation.getOrthoProjectionMatrix(0, window.getWidth(), window.getHeight(), 0);
+		
 		// Render the sprite
 		DummyGame.sceneManager.Render();
 	}

@@ -23,7 +23,16 @@ public class Vector2D {
 		this.x = x;
 		this.y = y;
 	}
-
+	
+	public static float distance(Vector2D from, Vector2D to){
+		
+		float distance = 0;
+		
+		distance = (float) Math.sqrt(Math.pow(from.x - to.x, 2) + Math.pow(from.y - to.y, 2));
+		
+		return distance;
+		
+	}
 	public void copy(Vector2D vec) {
 		this.x = vec.x;
 		this.y = vec.y;

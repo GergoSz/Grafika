@@ -3,6 +3,7 @@ package com.iit.uni.engine.graph;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+
 public class Transformation {
 
 	private final Matrix4f projectionMatrix;
@@ -10,6 +11,8 @@ public class Transformation {
 	private final Matrix4f worldMatrix;
 
 	private final Matrix4f orthoMatrix;
+	
+	private final float scale = 1f;
 
 	public Transformation() {
 		worldMatrix = new Matrix4f();
@@ -32,7 +35,7 @@ public class Transformation {
 
 	public final Matrix4f getOrthoProjectionMatrix(float left, float right, float bottom, float top) {
 		orthoMatrix.identity();
-		orthoMatrix.setOrtho2D(left, right, bottom, top);
+		orthoMatrix.setOrtho2D( left / scale,right / scale, bottom / scale, top / scale);
 		return orthoMatrix;
 	}
 }

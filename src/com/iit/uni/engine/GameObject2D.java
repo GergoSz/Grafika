@@ -14,29 +14,29 @@ import com.iit.uni.engine.math.Vector2D;
  */
 public class GameObject2D {
 
-	private boolean mVisible;
+	protected boolean mVisible;
 
 	private int mID;
 
 	// Entity Name
 	private String mName = "";
 
-	private Vector2D m_vPosition; // Position of the object
+	protected Vector2D m_vPosition; // Position of the object
 	private Vector2D m_vDirection; // Direction of the movement
-	private float mScale; // scale value
+	private float mScale = 2.6f; // scale value
 
-	private ArrayList<CSprite> m_Animations; // Animations
+	protected ArrayList<CSprite> m_Animations; // Animations
 
 	private boolean m_bInFrustum; // Object is in screen frustum or not
 	private boolean mCollidable; // Object is collidable or not
 
-	private int m_uiCurrentAnim; // Current Animation Frame
-	private int m_uiNumberOfFrames; // Number of Animations
+	protected int m_uiCurrentAnim; // Current Animation Frame
+	protected int m_uiNumberOfFrames; // Number of Animations
 
 	private float m_fSpeed; // Speed of the object
 	private float m_fRotateValue; // rotate value of the object
 
-	private int m_iZindex; // Z index of the object
+	private float m_iZindex; // Z index of the object
 
 	///
 	/// Default Constructor
@@ -54,8 +54,8 @@ public class GameObject2D {
 		m_iZindex = 0;
 		m_bInFrustum = false;
 
-		mScale = 1.0f;
-
+		
+		
 		mCollidable = true;
 	}
 
@@ -72,7 +72,9 @@ public class GameObject2D {
 
 		m_vPosition = new Vector2D(0.0f, 0.0f);
 		m_vDirection = new Vector2D(0.0f, 0.0f);
-		mScale = 1.0f;
+		
+		
+
 
 		m_fSpeed = 1.0f;
 		m_Animations.get(m_uiCurrentAnim).SetAnimationSpeed(25);
@@ -187,7 +189,7 @@ public class GameObject2D {
 	///
 	public void Draw() {
 		
-		SetZIndex((int)m_vPosition.y);
+		SetZIndex(m_vPosition.y);
 		
 		if (m_uiNumberOfFrames > 0) {
 			if (mVisible == true) {
@@ -305,14 +307,14 @@ public class GameObject2D {
 	///
 	/// Set Z index of the object. Needs for proper rendering order.
 	///
-	public void SetZIndex(int value) {
+	public void SetZIndex(float value) {
 		m_iZindex = value;
 	}
 
 	///
 	/// Get Z index of the object.
 	///
-	public int GetZIndex() {
+	public float GetZIndex() {
 		return m_iZindex;
 	}
 

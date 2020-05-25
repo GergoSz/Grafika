@@ -46,6 +46,11 @@ public class CSprite {
 	}
 
 	public CSprite(String filenames, int numOfFrames, float X, float Y) {
+		this(filenames, numOfFrames);
+		m_vSpritePosition = new Vector2D(X, Y);
+	}
+	
+	public CSprite(String filenames, int numOfFrames) {
 		m_iActualFrame = 0;
 		m_iLastUpdate = System.currentTimeMillis();
 		m_iFps = 15; // default FPS animation rate
@@ -54,7 +59,7 @@ public class CSprite {
 		/** Loading textures */
 		LoadTextures(filenames, numOfFrames);
 
-		m_vSpritePosition = new Vector2D(X, Y);
+		m_vSpritePosition = new Vector2D();
 	}
 
 	/**
@@ -71,7 +76,7 @@ public class CSprite {
 
 			// Create sprite frame
 			CSpriteFrame newFrame = new CSpriteFrame(tex, "Frame_1");
-			newFrame.AddBoundingBox(new Vector2D(0.0f, 0.0f), new Vector2D(tex.GetWidth(), tex.GetHeight()));
+			//newFrame.AddBoundingBox(new Vector2D(0.0f, 0.0f), new Vector2D(tex.GetWidth(), tex.GetHeight()));
 			m_vFrames.add(newFrame);
 
 		} else {
@@ -82,7 +87,7 @@ public class CSprite {
 
 				// Create sprite frame
 				CSpriteFrame newFrame = new CSpriteFrame(tex, "Frame_" + i);
-				newFrame.AddBoundingBox(new Vector2D(0, 0), new Vector2D(tex.GetWidth(), tex.GetHeight()));
+				//newFrame.AddBoundingBox(new Vector2D(0, 0), new Vector2D(tex.GetWidth(), tex.GetHeight()));
 
 				m_vFrames.add(newFrame);
 			}
@@ -108,10 +113,10 @@ public class CSprite {
 		BoundingBox2D original = currentFrame.GetOriginalBB();
 		BoundingBox2D transformed = currentFrame.GetTransformedBB();
 
-		//transformed.SetPoints(original.GetMinPoint(), original.GetMaxPoint());
-		//transformed.transformByRotate(0, 0, 0, 1);
-		//transformed.transformByScale(new Vector2D(1, 1));
-		//transformed.transformByTranslate(new Vector2D(m_vSpritePosition.x, m_vSpritePosition.y));
+		transformed.SetPoints(original.GetMinPoint(), original.GetMaxPoint());
+		transformed.transformByRotate(0, 0, 0, 1);
+		transformed.transformByScale(new Vector2D(1, 1));
+		transformed.transformByTranslate(new Vector2D(m_vSpritePosition.x, m_vSpritePosition.y));
 
 		return transformed;
 	}
