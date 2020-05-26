@@ -20,7 +20,7 @@ public class FloorTile extends GameObject2D{
 		//box = new BoundingBox2D(new Vector2D(20, 22), new Vector2D(200, 220));
 		
 		Random rand = new Random();
-		if(rand.nextInt(100) < variantChance)
+		if(rand.nextInt(100/variantChance)+1 == 1)
 		variantID = rand.nextInt(7);
 		
 	}
@@ -60,6 +60,10 @@ public class FloorTile extends GameObject2D{
 		for (int i = 0; i < m_uiNumberOfFrames; ++i) {
 			m_Animations.get(i).SetPosition(x,y);
 		}
+	}
+	
+	public void setVariantID(int vID) {
+		variantID = vID;
 	}
 	
 }

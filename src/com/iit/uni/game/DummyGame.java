@@ -43,7 +43,11 @@ public class DummyGame implements IGameLogic {
 	private C2DScene scene;
 	
 	private BoundingBox2D center;
+	boolean a = true;
 
+	Map map = new Map(100, 80, "seed");
+	C2DGraphicsLayer mapLayer = new C2DGraphicsLayer();
+	
 	public DummyGame() {
 		renderer = new Renderer();
 	}
@@ -155,8 +159,10 @@ public class DummyGame implements IGameLogic {
 		/*scene.RegisterLayer(layer2);
 		scene.RegisterLayer(layer3);
 		scene.RegisterLayer(layer4);*/
-		Map map = new Map(50,40);
-		scene.RegisterLayer(map.GetMapLayer());
+		
+		map.DrawToLayer(mapLayer);
+		
+		scene.RegisterLayer(mapLayer);
 		scene.RegisterLayer(enityLayer);
 		
 		// Register scene at the manager
@@ -188,6 +194,7 @@ public class DummyGame implements IGameLogic {
 			player.setCenterPoint(centerPos);
 			renderer.projectionMatrix.translate(0, -1, 0);
 			}
+			
 		}else
 		if (window.isKeyPressed('A')) {
 			direction = "A";
@@ -250,14 +257,21 @@ public class DummyGame implements IGameLogic {
 			}
 		}
 		
-		//System.out.println(Vector2D.distance(player.GetPosition(), dummy.GetPosition()));
+		//System.out.println(Vector2D.distance(player.GetPosition( ), dummy.GetPosition()));
 		
 		
-		if(window.isKeyPressed(' ')) {
-			player.SetCurrentFrame(5);
-			System.out.println(renderer.projectionMatrix);
+		
+		if(window.isKeyPressed(' ') && a) {
+			//player.SetCurrentFrame(5);
+			//System.out.println(renderer.projectionMatrix);
+			a = false;
+			map.GenerateMap();
+			map.DrawToLayer(mapLayer);
 		}
 
+		if(window.isKeyReleased(' ')) {
+			a = true;
+		}
 		
 	}
 
@@ -269,6 +283,8 @@ public class DummyGame implements IGameLogic {
 	@Override
 	public void render(Window window) {
 		renderer.render(window);
+
+		Map.DrawLines();
 		//center.Draw();
 	}
 

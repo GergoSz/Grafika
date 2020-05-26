@@ -12,7 +12,7 @@ public class Transformation {
 
 	private final Matrix4f orthoMatrix;
 	
-	private final float scale = 1f;
+	private final float scale = 0.5f;
 
 	public Transformation() {
 		worldMatrix = new Matrix4f();
