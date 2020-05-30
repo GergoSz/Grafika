@@ -38,6 +38,7 @@ public class ShaderProgram {
         FloatBuffer fb = BufferUtils.createFloatBuffer(16);
         value.get(fb);
         glUniformMatrix4fv(uniforms.get(uniformName), false, fb);
+      
     }
 
 	public void setUniform4f(String uniformName, float v0, float v1, float v2, float v3) {

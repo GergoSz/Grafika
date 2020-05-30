@@ -45,7 +45,8 @@ public class DummyGame implements IGameLogic {
 	private BoundingBox2D center;
 	boolean a = true;
 
-	Map map = new Map(100, 80, "seed");
+	
+	Map map = new Map(100, 80);
 	C2DGraphicsLayer mapLayer = new C2DGraphicsLayer();
 	
 	public DummyGame() {
@@ -277,14 +278,14 @@ public class DummyGame implements IGameLogic {
 
 	@Override
 	public void update(float interval) {
-
+	
 	}
 
 	@Override
 	public void render(Window window) {
 		renderer.render(window);
 
-		Map.DrawLines();
+		//Map.DrawLines();
 		//center.Draw();
 	}
 

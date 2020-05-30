@@ -71,6 +71,7 @@ public class Map {
 	}
 	
 	void GenerateMap() {
+		lines.clear();
 		map = new int[width][height];
 		RandomFillMap();
 		
@@ -79,7 +80,7 @@ public class Map {
 		}
 		
 		ProcessMap();
-		
+						
 		/*int borderSize = 1;
 		borderedMap = new int[width + borderSize * 2][ height + borderSize * 2];
 		
@@ -200,10 +201,36 @@ public class Map {
 			}
 		}
 		
-		ConnectClosestRooms(roomsLeft);
+		roomsLeft.sort(null);
+	  /*for (Room room : roomsLeft) {
+			System.out.println(room.roomSize);
+		}*/
+		
+		roomsLeft.get(0).isMainRoom = true;
+		roomsLeft.get(0).isAccessibleFromMainRoom = true;
+		
+		
+		
+		ConnectClosestRooms(roomsLeft, false);
 	}
 	
-	void ConnectClosestRooms(ArrayList<Room> allRooms) {
+	void ConnectClosestRooms(ArrayList<Room> allRooms, boolean forceAccessFromMainRoom) {
+		
+		ArrayList<Room> roomListA = new ArrayList<Room>();
+		ArrayList<Room> roomListB = new ArrayList<Room>();
+		
+		if(forceAccessFromMainRoom) {
+			for (Room room : allRooms) {
+				if(room.isAccessibleFromMainRoom) {
+					roomListB.add(room);
+				}else {
+					roomListA.add(room);
+				}
+			}
+		}else {
+			roomListA = allRooms;
+			roomListB = allRooms;
+		}
 		
 		int bestDistance = 0;
 		Coord bestTileA = new Coord();
@@ -212,18 +239,22 @@ public class Map {
 		Room bestRoomB = new Room();
 		boolean possibleConnectionFound = false;
 		
-		for (Room roomA : allRooms) {
-			possibleConnectionFound = false;
-						
-			for (Room roomB : allRooms) {
-				
-				if(roomA == roomB) {
+		for (Room roomA : roomListA) {
+			if(!forceAccessFromMainRoom) {
+				possibleConnectionFound = false;
+				if(roomA.connectedRooms.size() > 0) {
 					continue;
 				}
-				if(roomA.IsConnected(roomB)) {
-					possibleConnectionFound = false;
-					break;
+			}
+			
+			
+						
+			for (Room roomB : roomListB) {
+				
+				if(roomA == roomB || roomA.IsConnected(roomB)) {
+					continue;
 				}
+				
 				for(int tileIndexA = 0; tileIndexA < roomA.edgeTiles.size(); tileIndexA++) {
 					for(int tileIndexB = 0; tileIndexB < roomB.edgeTiles.size(); tileIndexB++) {
 						Coord tileA = roomA.edgeTiles.get(tileIndexA);
@@ -242,12 +273,20 @@ public class Map {
 				}
 			}
 			
-			if(possibleConnectionFound) {
+			if(possibleConnectionFound && !forceAccessFromMainRoom) {
 				CreatePassage(bestRoomA, bestRoomB, bestTileA, bestTileB);
 			}
 			
 		}
 		
+		if(possibleConnectionFound && forceAccessFromMainRoom) {
+			CreatePassage(bestRoomA, bestRoomB, bestTileA, bestTileB);
+			ConnectClosestRooms(allRooms, true);
+		}
+				
+		if(!forceAccessFromMainRoom) {
+			ConnectClosestRooms(allRooms, true);
+		}
 		
 	}
 	
@@ -259,107 +298,82 @@ public class Map {
             glVertex2f(20, 20);
         glEnd();*/
 		
-		lines.add(new Line(tileA.toVec2D(), tileB.toVec2D()));
-		Coord a = new Coord(0,0);
-		Coord b = new Coord(0,1);
-		lines.add(new Line(a.toVec2D(),b.toVec2D()));
-	}
-	
-	public static void DrawLines() {
-
-//		Vector2D minpoint = new Vector2D(20, 20);
-//		Vector2D maxpoint = new Vector2D(70, 50);
+		ArrayList<Coord> line = GetLineCoords(tileA, tileB);
 		
-		for (Line line : lines) {
-			// Data for quad
-			float vertices[] = { line.pointA.x, line.pointA.y, 0.0f, line.pointB.x, line.pointB.y, 0.0f, line.pointB.x, line.pointB.y, 0.0f,
-					line.pointA.x, line.pointA.y, 0.0f, line.pointA.x, line.pointA.y, 0.0f };
-
-			// Create new VAO Object
-			int vaoId = glGenVertexArrays();
-			glBindVertexArray(vaoId);
-
-			// Position VBO
-			int vboId = glGenBuffers();
-
-			FloatBuffer posBuffer = BufferUtils.createFloatBuffer(vertices.length);
-			posBuffer.put(vertices).flip();
-			glBindBuffer(GL_ARRAY_BUFFER, vboId);
-			glBufferData(GL_ARRAY_BUFFER, posBuffer, GL_STATIC_DRAW);
-			glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-
-			// Activate shader
-			Renderer.mRenderer.lineShader.bind();
-			Renderer.mRenderer.lineShader.setUniform("projectionMatrix", Renderer.mRenderer.projectionMatrix);
-
-			// Set world/model matrix for this item
-			Matrix4f modelMatrix = new Matrix4f();
-			Renderer.mRenderer.lineShader.setUniform("modelMatrix", modelMatrix);
-
-			// Set color
-			Renderer.mRenderer.lineShader.setUniform4f("linecolor", 0f, 1f, 0f, 1.0f);
-
-			// Render the VAO
-			glBindVertexArray(vaoId);
-			glEnableVertexAttribArray(0);
-
-			//glDisable(GL_DEPTH_TEST);
-			glDrawArrays(GL_LINE_STRIP, 0, 5);
-			//glEnable(GL_DEPTH_TEST);
-			// Restore state
-			glDisableVertexAttribArray(0);
-
-			Renderer.mRenderer.lineShader.unbind();
+		for (Coord coord : line) {
+			DrawCircle(coord, 1);
 		}
 		
-		
+		/*lines.add(new Line(tileA.toVec2D(), tileB.toVec2D()));
+		Coord a = new Coord(0,0);
+		Coord b = new Coord(0,1);
+		lines.add(new Line(a.toVec2D(),b.toVec2D()));*/
 	}
 	
-	/*public void DrawLine(Coord a, Coord b) {
-
-		
-
-		// Data for quad
-		float vertices[] = { a.tileX, a.tileY, 0.0f,b.tileX, b.tileY, 0.0f, 0, 0, 0.0f,
-				0, 0, 0.0f, 0, 0, 0.0f  };
-
-		// Create new VAO Object
-		int vaoId = glGenVertexArrays();
-		glBindVertexArray(vaoId);
-
-		// Position VBO
-		int vboId = glGenBuffers();
-
-		FloatBuffer posBuffer = BufferUtils.createFloatBuffer(vertices.length);
-		posBuffer.put(vertices).flip();
-		glBindBuffer(GL_ARRAY_BUFFER, vboId);
-		glBufferData(GL_ARRAY_BUFFER, posBuffer, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-
-		// Activate shader
-		Renderer.mRenderer.lineShader.bind();
-		Renderer.mRenderer.lineShader.setUniform("projectionMatrix", Renderer.mRenderer.projectionMatrix);
-
-		// Set world/model matrix for this item
-		Matrix4f modelMatrix = new Matrix4f();
-		Renderer.mRenderer.lineShader.setUniform("modelMatrix", modelMatrix);
-
-		// Set color
-		Renderer.mRenderer.lineShader.setUniform4f("linecolor", 0.8f, 0.4f, 0.4f, 1.0f);
-
-		// Render the VAO
-		glBindVertexArray(vaoId);
-		glEnableVertexAttribArray(0);
-
-		//glDisable(GL_DEPTH_TEST);
-		glDrawArrays(GL_LINE_STRIP, 0, 5);
-		//glEnable(GL_DEPTH_TEST);
-		// Restore state
-		glDisableVertexAttribArray(0);
-
-		Renderer.mRenderer.lineShader.unbind();
+	void DrawCircle(Coord c, int r) {
+		for(int x = -r; x <= r; x++) {
+			for(int y = -r; y <= r; y++) {
+				if(x*x + y*y <= r*r) {
+					int realX = c.tileX + x;
+					int realY = c.tileY + y;
+					if(IsInMapRange(realX, realY)) {
+						map[realX][realY] = 0;
+					}
+				}
+			}
+		}
 	}
-	*/
+	
+	public ArrayList<Coord> GetLineCoords(Coord start, Coord end){
+		ArrayList<Coord> line = new ArrayList<Coord>();
+		
+		boolean inverted = false;
+		
+		int x = start.tileX;
+		int y = start.tileY;
+		
+		int dx = end.tileX - start.tileX;
+		int dy = end.tileY - start.tileY;
+		
+		int step = (int) Math.signum(dx);
+		int gradientStep = (int) Math.signum(dy);
+		
+		int longest = Math.abs(dx);
+		int shortest = Math.abs(dy);
+		
+		if(longest < shortest) {
+			inverted = true;
+			longest = Math.abs(dy);
+			shortest = Math.abs(dx);
+			
+			step = (int) Math.signum(dy);
+			gradientStep = (int) Math.signum(dx);
+		}
+		
+		int gradientAccumulation = longest / 2;
+		for (int i = 0; i < longest; i++) {
+			line.add(new Coord(x,y));
+			
+			if(inverted) {
+				y += step;
+			}else {
+				x += step;
+			}
+			
+			gradientAccumulation += shortest;
+			if(gradientAccumulation >= longest) {
+				if(inverted) {
+					x += gradientStep;
+				}else {
+					y += gradientStep;
+				}
+				gradientAccumulation -= longest;
+			}
+		}
+		
+		return line;
+	}
+
 	ArrayList<ArrayList<Coord>> GetRegions (int tileType){
 		ArrayList<ArrayList<Coord>> regions = new ArrayList<ArrayList<Coord>>();
 		int[][] mapFlags = new int[width][height];
@@ -409,7 +423,6 @@ public class Map {
 		}
 
 		public Coord() {
-			// TODO Auto-generated constructor stub
 		}
 		public Vector2D toVec2D() {
 			return new Vector2D(64 + (tileX * 16), 64 + (tileY * 16));
@@ -427,11 +440,13 @@ public class Map {
 		public Line() {}
 	}
 	
-	public static class Room{
+	public static class Room implements Comparable<Room>{
 		public ArrayList<Coord> tiles;
 		public ArrayList<Coord> edgeTiles;
 		public ArrayList<Room> connectedRooms;
 		public int roomSize;
+		public boolean isAccessibleFromMainRoom;
+		public boolean isMainRoom;
 		
 		public Room() {
 			
@@ -457,7 +472,21 @@ public class Map {
 			
 		}
 		
+		public void setAccessibleFromMainRoom() {
+			if(!isAccessibleFromMainRoom) {
+				isAccessibleFromMainRoom = true;
+				for (Room connectedRoom : connectedRooms) {
+					connectedRoom.setAccessibleFromMainRoom();
+				}
+			}
+		}
+		
 		public static void ConnectRooms(Room roomA, Room roomB) {
+			if(roomA.isAccessibleFromMainRoom) {
+				roomB.setAccessibleFromMainRoom();
+			}else if(roomB.isAccessibleFromMainRoom) {
+				roomA.setAccessibleFromMainRoom();
+			}
 			roomA.connectedRooms.add(roomB);
 			roomB.connectedRooms.add(roomA);
 			
@@ -466,12 +495,67 @@ public class Map {
 		public boolean IsConnected(Room otherRoom) {
 			return connectedRooms.contains(otherRoom);
 		}
+
+		@Override
+		public int compareTo(Room otherRoom) {
+			return Integer.compare(otherRoom.roomSize, roomSize);
+		}
 	}
 	
 	boolean IsInMapRange(int x, int y) {
 		return x >= 0 && x < width && y >= 0 && y < height;
 	}
 
+	//TODO: Move to drawDebugStuff
+	/*public static void DrawLines() {
+
+//		Vector2D minpoint = new Vector2D(20, 20);
+//		Vector2D maxpoint = new Vector2D(70, 50);
 		
+		for (Line line : lines) {
+			// Data for quad
+			float vertices[] = { line.pointA.x, line.pointA.y, 0.0f, line.pointB.x, line.pointB.y, 0.0f, line.pointB.x, line.pointB.y, 0.0f,
+					line.pointA.x, line.pointA.y, 0.0f, line.pointA.x, line.pointA.y, 0.0f };
+
+			// Create new VAO Object
+			int vaoId = glGenVertexArrays();
+			glBindVertexArray(vaoId);
+
+			// Position VBO
+			int vboId = glGenBuffers();
+
+			FloatBuffer posBuffer = BufferUtils.createFloatBuffer(vertices.length);
+			posBuffer.put(vertices).flip();
+			glBindBuffer(GL_ARRAY_BUFFER, vboId);
+			glBufferData(GL_ARRAY_BUFFER, posBuffer, GL_STATIC_DRAW);
+			glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+
+			// Activate shader
+			Renderer.mRenderer.lineShader.bind();
+			Renderer.mRenderer.lineShader.setUniform("projectionMatrix", Renderer.mRenderer.projectionMatrix);
+
+			// Set world/model matrix for this item
+			Matrix4f modelMatrix = new Matrix4f();
+			Renderer.mRenderer.lineShader.setUniform("modelMatrix", modelMatrix);
+
+			// Set color
+			Renderer.mRenderer.lineShader.setUniform4f("linecolor", 0f, 1f, 0f, 1.0f);
+
+			// Render the VAO
+			glBindVertexArray(vaoId);
+			glEnableVertexAttribArray(0);
+
+			//glDisable(GL_DEPTH_TEST);
+			glDrawArrays(GL_LINE_STRIP, 0, 5);
+			//glEnable(GL_DEPTH_TEST);
+			// Restore state
+			glDisableVertexAttribArray(0);
+
+			Renderer.mRenderer.lineShader.unbind();
+		}
+		
+		
+	}
+	*/
 	
 }
