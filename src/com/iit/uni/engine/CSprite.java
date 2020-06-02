@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.joml.Matrix4f;
 
 import com.iit.uni.engine.math.Vector2D;
+import com.iit.uni.game.Renderer;
 
 /*******************************************************************************
  * Animated Texture class as sprite
@@ -123,8 +124,9 @@ public class CSprite {
 
 	/** Draw Animated Sprite */
 	public void Draw(Vector2D pos) {	
-		Texture2D tex = m_vFrames.get(m_iActualFrame).GetTexture();
-		tex.Draw(pos);
+		Texture2D texture = m_vFrames.get(m_iActualFrame).GetTexture();
+		//Renderer.mRenderer.shaderProgram.setUniform4f("texture_color", 1, 1, 1, 0.5f);
+		texture.Draw(pos.add(new Vector2D(-16, -16)));
 		Update();
 	}
 

@@ -12,7 +12,7 @@ public class Transformation {
 
 	private final Matrix4f orthoMatrix;
 	
-	private final float scale = 0.5f;
+	private float scale = 2f;
 
 	public Transformation() {
 		worldMatrix = new Matrix4f();
@@ -37,5 +37,9 @@ public class Transformation {
 		orthoMatrix.identity();
 		orthoMatrix.setOrtho2D( left / scale,right / scale, bottom / scale, top / scale);
 		return orthoMatrix;
+	}
+	
+	public void setScale(float scale) {
+		this.scale = scale;
 	}
 }

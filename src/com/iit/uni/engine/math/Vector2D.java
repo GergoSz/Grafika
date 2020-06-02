@@ -9,6 +9,8 @@ package com.iit.uni.engine.math;
  */
 public class Vector2D {
 
+	
+
 	public float x;
 	public float y;
 
@@ -24,6 +26,11 @@ public class Vector2D {
 		this.y = y;
 	}
 	
+	public Vector2D(Vector2D pos) {
+		this.x = pos.x;
+		this.y = pos.y;
+	}
+
 	public static float distance(Vector2D from, Vector2D to){
 		
 		float distance = 0;
@@ -153,5 +160,10 @@ public class Vector2D {
 
 	public void setY(float y) {
 		this.y = y;
+	}
+	
+	@Override
+	public String toString() {
+		return "Vector2D [x=" + x + ", y=" + y + "]";
 	}
 }

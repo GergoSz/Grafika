@@ -13,7 +13,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		try {
-			boolean vSync = true;
+			boolean vSync = false;
 			IGameLogic gameLogic = new DummyGame();
 			GameEngine gameEng = new GameEngine("2D Sprite Animation with AABB Demo", 1024, 768, vSync, gameLogic);
 			gameEng.start();

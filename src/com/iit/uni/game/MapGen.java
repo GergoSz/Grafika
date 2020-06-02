@@ -35,9 +35,9 @@ import com.iit.uni.engine.C2DGraphicsLayer;
 import com.iit.uni.engine.GameObject2D;
 import com.iit.uni.engine.SpriteLoader;
 import com.iit.uni.engine.math.Vector2D;
-import com.iit.uni.game.Map.Coord;
+import com.iit.uni.game.MapGen.Coord;
 
-public class Map {
+public class MapGen {
 
 	public int randomFillPercent = 40;
 	
@@ -47,21 +47,21 @@ public class Map {
 	public int width;
 	public int height;
 	
-	ArrayList<GameObject2D> floors = new ArrayList<GameObject2D>();
+	public ArrayList<FloorTile> floors = new ArrayList<FloorTile>();
 	static ArrayList<Line> lines = new ArrayList<Line>();
 	
 	int[][] map;
 	int[][] borderedMap;
 	int[][] mapFlags;
 	
-	public Map(int width, int height) {
+	public MapGen(int width, int height) {
 		this.width = width;
 		this.height = height;
 		mapFlags = new int[width][height];
 		GenerateMap();
 	}
 	
-	public Map(int width, int height, String seed) {
+	public MapGen(int width, int height, String seed) {
 		this.width = width;
 		this.height = height;
 		this.useRandomSeed = false;
@@ -394,23 +394,125 @@ public class Map {
 		return regions;
 	}
 	
-	void DrawToLayer(C2DGraphicsLayer mapLayer) {
+	public ArrayList<FloorTile> GetAdjacentFloors(Vector2D pos){
+		ArrayList<FloorTile> adjacentFloors = new ArrayList<FloorTile>();
+		
+		for (FloorTile floorTile : floors) {
+			if(Vector2D.distance(floorTile.GetPosition(), pos) < 25) {
+				floorTile.setVariantID(8);
+				adjacentFloors.add(floorTile);
+			}else {
+				floorTile.setVariantID(2);
+			}
+		}
+		
+		return adjacentFloors;
+	}
+	
+	void DrawToLayer(C2DGraphicsLayer floorLayer, C2DGraphicsLayer wallLayer, C2DGraphicsLayer ceilingLayer) {
 		SpriteLoader spriteLoader = SpriteLoader.getInstance();
-		mapLayer.Clear();		
+		floorLayer.Clear();
+		
 		for (int x = 0; x < map.length; x++) {
 			for (int y = 0; y < map[0].length; y++) {
 				if(map[x][y] == 0) {
 					FloorTile floorTile = new FloorTile();
-					floorTile.AddFrame(spriteLoader.GetAnim("floor"));
 					floorTile.AddFrame(spriteLoader.GetAnim("floorVariants"));
-					floorTile.SetPosition(64+(x * 16),64+(y * 16));
+					floorTile.SetPosition((x * 16),(y * 16));
 					floors.add(floorTile);
-					mapLayer.AddGameObject(floorTile);
-				}
-				
+				}/*else {
+					CeilingTile ceilingTile = new CeilingTile();
+					Vector2D ceilingPos = new Vector2D(64+(x * 16),64+(y * 16));
+					ceilingTile.SetPosition(ceilingPos);
+					wallLayer.AddGameObject(ceilingTile);
+				}*/
 			}
 		}
 		
+		ArrayList<Coord> allTiles = new ArrayList<Coord>();
+		
+		for (int x = 0; x < map.length; x++) {
+			for (int y = 0; y < map[0].length; y++) {
+				if(map[x][y] == 0) {
+					allTiles.add(new Coord(x,y));
+				}
+			}
+		}
+		
+		Room mapAsRoom = new Room(allTiles, map);
+		
+		for (Coord edgeTile : mapAsRoom.edgeTiles) {
+			
+			if(IsInMapRange(edgeTile.tileX, edgeTile.tileY - 2)) {
+				if(map[edgeTile.tileX][edgeTile.tileY - 1] == 1 && map[edgeTile.tileX][edgeTile.tileY - 2] == 1) {
+					WallTile wallTile = new WallTile();
+					
+					Vector2D wallPos = new Vector2D(edgeTile.toVec2D().x, edgeTile.toVec2D().y - 32);
+					wallTile.SetPosition(wallPos);
+					
+					wallLayer.AddGameObject(wallTile);
+					
+						/*CeilingTile ceilingTile = new CeilingTile();
+						Vector2D ceilingPos = new Vector2D(edgeTile.toVec2D().x, edgeTile.toVec2D().y - 48);
+						ceilingTile.SetPosition(ceilingPos);
+						wallLayer.AddGameObject(ceilingTile);
+					*/
+				}/*else {
+					if(IsInMapRange(edgeTile.tileX + 1, edgeTile.tileY)) {
+						if(map[edgeTile.tileX + 1][edgeTile.tileY] == 1) {
+							CeilingTile ceilingTile = new CeilingTile();
+							Vector2D ceilingPos = new Vector2D(edgeTile.toVec2D().x + 16, edgeTile.toVec2D().y);
+							ceilingTile.SetPosition(ceilingPos);
+							wallLayer.AddGameObject(ceilingTile);			
+						}
+					}
+					if(IsInMapRange(edgeTile.tileX - 1, edgeTile.tileY)) {
+						if(map[edgeTile.tileX - 1][edgeTile.tileY] == 1) {
+							CeilingTile ceilingTile = new CeilingTile();
+							Vector2D ceilingPos = new Vector2D(edgeTile.toVec2D().x - 16, edgeTile.toVec2D().y);
+							ceilingTile.SetPosition(ceilingPos);
+							wallLayer.AddGameObject(ceilingTile);			
+						}
+					}
+				}*/
+			}
+			
+			if(IsInMapRange(edgeTile.tileX, edgeTile.tileY + 1)) {
+				if(map[edgeTile.tileX][edgeTile.tileY + 1] == 1) {
+					CeilingTile ceilingTile = new CeilingTile();
+					Vector2D ceilingPos = new Vector2D(edgeTile.toVec2D().x, edgeTile.toVec2D().y);
+					ceilingTile.SetPosition(ceilingPos);
+					ceilingLayer.AddGameObject(ceilingTile);			
+				}
+			}
+			
+			FloorTile floorTile = new FloorTile();
+			floorTile.SetPosition(edgeTile.toVec2D());
+			//floorTile.setVariantID(8);
+			floors.add(floorTile);
+			
+		}
+		
+		for (FloorTile floor : floors) {
+			floorLayer.AddGameObject(floor);
+		}
+		
+		
+	}
+	
+	public boolean isFloor(Vector2D pos) {
+		if(map[ (int) pos.x/16 ][ (int) pos.y/16 ] == 0) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+	
+	public void updateFloors(C2DGraphicsLayer floorLayer) {
+		floorLayer.Clear();
+		for (FloorTile floor : floors) {
+			floorLayer.AddGameObject(floor);
+		}
 	}
 	
 	public class Coord {
@@ -424,8 +526,9 @@ public class Map {
 
 		public Coord() {
 		}
+		
 		public Vector2D toVec2D() {
-			return new Vector2D(64 + (tileX * 16), 64 + (tileY * 16));
+			return new Vector2D((tileX * 16), (tileY * 16));
 		}
 	}
 	
@@ -457,7 +560,7 @@ public class Map {
 			roomSize = tiles.size();
 			connectedRooms = new ArrayList<Room>();
 			
-			edgeTiles = new ArrayList<Map.Coord>();
+			edgeTiles = new ArrayList<MapGen.Coord>();
 			for (Coord tile : tiles) {
 				for(int x = tile.tileX - 1; x <= tile.tileX + 1; x++) {
 					for(int y = tile.tileY - 1; y <= tile.tileY + 1; y++) {

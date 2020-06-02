@@ -9,24 +9,25 @@ import com.iit.uni.engine.SpriteLoader;
 import com.iit.uni.engine.Texture2D;
 import com.iit.uni.engine.math.Vector2D;
 
-public class FloorTile extends GameObject2D{
-
-	private BoundingBox2D box;
-	private int variantID;
-	private final int variantChance = 10;
+public class WallTile  extends GameObject2D{
 	
-	public FloorTile() {
+	
+	private int variantID;
+	private final int variantChance = 100;
+	private BoundingBox2D box;
+	
+	public WallTile() {
 		super();
 		box = new BoundingBox2D();
 		//box = new BoundingBox2D(new Vector2D(20, 22), new Vector2D(200, 220));
 		SpriteLoader sp = SpriteLoader.getInstance();
-		this.AddFrame(sp.GetAnim("floorVariants"));
+		this.AddFrame(sp.GetAnim("wallVariants"));
 		Random rand = new Random();
 		if(rand.nextInt(100/variantChance)+1 == 1)
-			variantID = rand.nextInt(7);
+			variantID = rand.nextInt(4) + 1;
 		
 	}
-
+	
 	@Override
 	public void Draw() {
 		
@@ -67,5 +68,5 @@ public class FloorTile extends GameObject2D{
 	public void setVariantID(int vID) {
 		variantID = vID;
 	}
-	
+
 }

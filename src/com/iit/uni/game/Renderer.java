@@ -13,6 +13,7 @@ import com.iit.uni.engine.Utils;
 import com.iit.uni.engine.Window;
 import com.iit.uni.engine.graph.ShaderProgram;
 import com.iit.uni.engine.graph.Transformation;
+import com.iit.uni.engine.math.MATRIX4X4;
 
 /**
  * Simple renderer class
@@ -22,7 +23,7 @@ import com.iit.uni.engine.graph.Transformation;
  */
 public class Renderer {
 
-	private final Transformation transformation;
+	public final Transformation transformation;
 
 	public ShaderProgram shaderProgram;
 
@@ -55,6 +56,8 @@ public class Renderer {
 		shaderProgram.createUniform("worldMatrix");
 		shaderProgram.createUniform("texture_sampler");
 
+		//shaderProgram.createUniform("texture_color");
+
 		lineShader = new ShaderProgram();
 		lineShader.createVertexShader(Utils.loadFile("shaders/line.vs"));
 		lineShader.createFragmentShader(Utils.loadFile("shaders/line.fs"));
@@ -64,6 +67,7 @@ public class Renderer {
 		lineShader.createUniform("projectionMatrix");
 		lineShader.createUniform("modelMatrix");
 		lineShader.createUniform("linecolor");
+
 
 		// Update orthogonal projection Matrix
 		projectionMatrix = transformation.getOrthoProjectionMatrix(0, window.getWidth(), window.getHeight(), 0);
@@ -82,6 +86,8 @@ public class Renderer {
 			glViewport(0, 0, window.getWidth(), window.getHeight());
 			window.setResized(false);
 		}
+		
+	
 		
 		//projectionMatrix.translate(new Vector3f(p.GetPosition().x,p.GetPosition().y,0));
 		//projectionMatrix = transformation.getOrthoProjectionMatrix(0, window.getWidth(), window.getHeight(), 0);
