@@ -10,6 +10,8 @@ public class Player extends GameObject2D{
 
 	private BoundingBox2D hitBox = new BoundingBox2D(new Vector2D(20, 22), new Vector2D(30, 32));
 	public BoundingBox2D feetBox = new BoundingBox2D(new Vector2D(20, 22), new Vector2D(30, 32));
+	public BoundingBox2D swordBoxD = new BoundingBox2D(new Vector2D(20, 22), new Vector2D(30, 32));
+	public BoundingBox2D swordBoxU = new BoundingBox2D(new Vector2D(20, 22), new Vector2D(30, 32));
 	
 	private Vector2D centerPoint = new Vector2D();
 	
@@ -29,10 +31,15 @@ public class Player extends GameObject2D{
 		this.AddFrame(spriteLoader.GetAnim("pIdleU"));
 		this.AddFrame(spriteLoader.GetAnim("pIdleR"));
 		this.AddFrame(spriteLoader.GetAnim("pIdleL"));
+		this.AddFrame(spriteLoader.GetAnim("pAttackL"));
+		this.AddFrame(spriteLoader.GetAnim("pAttackR"));
+		this.AddFrame(spriteLoader.GetAnim("pAttackU"));
 		
 		this.SetPosition(0,0);
 		hitBox = new BoundingBox2D(  new Vector2D(m_vPosition.x + 12, m_vPosition.y + 4), new Vector2D(m_vPosition.x + 20, m_vPosition.y + 28));
 		feetBox = new BoundingBox2D(  new Vector2D(m_vPosition.x + 12, m_vPosition.y + 22), new Vector2D(m_vPosition.x + 20, m_vPosition.y + 28));
+		swordBoxD = new BoundingBox2D(  new Vector2D(m_vPosition.x + 12, m_vPosition.y + 22), new Vector2D(m_vPosition.x + 20, m_vPosition.y + 28));
+		swordBoxU = new BoundingBox2D(  new Vector2D(m_vPosition.x + 12, m_vPosition.y + 22), new Vector2D(m_vPosition.x + 20, m_vPosition.y + 28));
 		
 	}
 	
@@ -56,10 +63,10 @@ public class Player extends GameObject2D{
 			if (mVisible == true) {
 				// Draw the current frame
 				m_Animations.get(m_uiCurrentAnim).Draw(m_vPosition);
-				feetBox.Draw();
-				testbox.Draw();
-				testbox2.Draw();
-//				hitBox.Draw();
+				//feetBox.Draw();
+				swordBoxU.Draw();
+				//swordBoxU.Draw();
+				//hitBox.Draw();
 			}
 		}
 	}
@@ -71,6 +78,8 @@ public class Player extends GameObject2D{
 		feetBox.SetPoints(  new Vector2D(m_vPosition.x - 6, m_vPosition.y + 6), new Vector2D(m_vPosition.x + 6, m_vPosition.y + 14));
 		testbox = new BoundingBox2D(new Vector2D(m_vPosition.x , m_vPosition.y ), new Vector2D(m_vPosition.x +1 , m_vPosition.y +1));
 		testbox2 = new BoundingBox2D(new Vector2D(centerPoint.x -40, centerPoint.y -40), new Vector2D(centerPoint.x +40 , centerPoint.y +40));
+		swordBoxD.SetPoints(  new Vector2D(m_vPosition.x - 16, m_vPosition.y - 2), new Vector2D(m_vPosition.x + 16, m_vPosition.y + 10));
+		swordBoxU.SetPoints(  new Vector2D(m_vPosition.x - 16, m_vPosition.y - 10), new Vector2D(m_vPosition.x + 16, m_vPosition.y + 4));
 		//System.out.println(m_vPosition.x);
 		for (int i = 0; i < m_uiNumberOfFrames; ++i) {
 			m_Animations.get(i).SetPosition(pos.x,pos.y);

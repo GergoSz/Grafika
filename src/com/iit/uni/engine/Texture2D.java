@@ -96,7 +96,7 @@ public class Texture2D {
 	 * @param filename
 	 * @return
 	 */
-	public boolean CreateTexture(String filename) {
+	public boolean CreateTexture(String filename, boolean isFlipped) {
 
 		try {
 			loadTexture(filename);
@@ -108,8 +108,19 @@ public class Texture2D {
 		// Create the Mesh
 		float[] positions = new float[] { 0.0f, mHeight, 0.0f, mWidth, mHeight, 0.0f, mWidth, 0.0f, 0.0f, mWidth, 0.0f,
 				0.0f, 0.0f, 0.0f, 0.0f, 0.0f, mHeight, 0.0f, };
-
-		float[] textCoords = new float[] { 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+		float[] textCoords;
+		if(isFlipped) {
+			textCoords = new float[] { 
+	                1.0f, 1.0f, 
+	                0.0f, 1.0f, 
+	                0.0f, 0.0f,
+	                0.0f, 0.0f, 
+	                1.0f, 0.0f, 
+	                1.0f, 1.0f };
+		}else {
+			textCoords = new float[] { 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+		}
+		
 
 		mesh = new Mesh(positions, textCoords, this, 6);
 		return true;

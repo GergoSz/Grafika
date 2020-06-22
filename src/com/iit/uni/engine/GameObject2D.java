@@ -64,7 +64,7 @@ public class GameObject2D {
 	///
 	public GameObject2D(String spriteFilename, int numOfFrames, int ID) {
 
-		CSprite sprite = new CSprite(spriteFilename, numOfFrames, 0.0f, 0.0f);
+		CSprite sprite = new CSprite(spriteFilename, numOfFrames, 0.0f, 0.0f, false);
 		m_Animations = new ArrayList<CSprite>();
 		m_Animations.add(sprite);
 		m_uiNumberOfFrames = 1;
@@ -104,7 +104,7 @@ public class GameObject2D {
 	/// Add new frame to the animation array
 	///
 	public void AddFrame(String spriteFilename, int numOfFrames) {
-		CSprite sprite = new CSprite(spriteFilename, numOfFrames, m_vPosition.x, m_vPosition.y);
+		CSprite sprite = new CSprite(spriteFilename, numOfFrames, m_vPosition.x, m_vPosition.y, false);
 
 		m_Animations.add(sprite);
 		m_uiNumberOfFrames++;

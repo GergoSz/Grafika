@@ -45,20 +45,20 @@ public class CSprite {
 		m_iFps = 15; // default FPS animation rate
 		m_vFrames = new ArrayList<CSpriteFrame>();
 	}
-
-	public CSprite(String filenames, int numOfFrames, float X, float Y) {
-		this(filenames, numOfFrames);
+	//Note to self: This is a disaster. Fix flipped!!!
+	public CSprite(String filenames, int numOfFrames, float X, float Y, boolean isFlipped) {
+		this(filenames, numOfFrames, isFlipped);
 		m_vSpritePosition = new Vector2D(X, Y);
 	}
 	
-	public CSprite(String filenames, int numOfFrames) {
+	public CSprite(String filenames, int numOfFrames, boolean isFlipped) {
 		m_iActualFrame = 0;
 		m_iLastUpdate = System.currentTimeMillis();
 		m_iFps = 15; // default FPS animation rate
 		m_vFrames = new ArrayList<CSpriteFrame>();
 		m_vFrames.clear();
 		/** Loading textures */
-		LoadTextures(filenames, numOfFrames);
+		LoadTextures(filenames, numOfFrames, isFlipped );
 
 		m_vSpritePosition = new Vector2D();
 	}
@@ -69,11 +69,11 @@ public class CSprite {
 	 * @param filenames
 	 * @param numOfFrames
 	 */
-	public void LoadTextures(String filenames, int numOfFrames) {
+	public void LoadTextures(String filenames, int numOfFrames, boolean isFlipped) {
 
 		if (numOfFrames == 1) {
 			Texture2D tex = new Texture2D();
-			tex.CreateTexture(filenames + ".png");
+			tex.CreateTexture(filenames + ".png", isFlipped);
 
 			// Create sprite frame
 			CSpriteFrame newFrame = new CSpriteFrame(tex, "Frame_1");
@@ -84,7 +84,7 @@ public class CSprite {
 			/** Loading single textures */
 			for (int i = 0; i < numOfFrames; i++) {
 				Texture2D tex = new Texture2D();
-				tex.CreateTexture(filenames + (i + 1) + ".png");
+				tex.CreateTexture(filenames + (i + 1) + ".png", isFlipped);
 
 				// Create sprite frame
 				CSpriteFrame newFrame = new CSpriteFrame(tex, "Frame_" + i);
@@ -128,6 +128,21 @@ public class CSprite {
 		//Renderer.mRenderer.shaderProgram.setUniform4f("texture_color", 1, 1, 1, 0.5f);
 		texture.Draw(pos.add(new Vector2D(-16, -16)));
 		Update();
+	}
+	
+	public boolean DrawOnce(Vector2D pos) {
+		
+		Texture2D texture = m_vFrames.get(m_iActualFrame).GetTexture();
+		//Renderer.mRenderer.shaderProgram.setUniform4f("texture_color", 1, 1, 1, 0.5f);
+		texture.Draw(pos.add(new Vector2D(-16, -16)));
+		if (1000.0f / m_iFps < (System.currentTimeMillis() - m_iLastUpdate)) {
+			m_iLastUpdate = System.currentTimeMillis();
+			if (++m_iActualFrame == m_vFrames.size()) {
+				m_iActualFrame = 0;
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/** Update frames */

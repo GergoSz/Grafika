@@ -35,11 +35,13 @@ public class DummyGame implements IGameLogic {
 
 	private final Renderer renderer;
 	private String direction = "none";
+	private boolean isAttacking = false;
 
 	// 2D GameObject items
 	private Player player;
-	private GameObject2D dummy;
-	private GameObject2D slime;
+	private Slime slime;
+	
+	private ArrayList<Slime> slimeList = new ArrayList<Slime>();
 	private WallTile wall;
 
 	// Global Scene manager
@@ -54,7 +56,10 @@ public class DummyGame implements IGameLogic {
 	
 	private BoundingBox2D center;
 	boolean a = true;
-
+	
+	Timer collectorTimer = new Timer();
+    float collectorElapsedSeconds = 0;
+    float attackElapsedSeconds = 0;
 	
 	MapGen map = new MapGen(100, 80);
 	C2DGraphicsLayer mapLayer = new C2DGraphicsLayer();
@@ -80,9 +85,13 @@ public class DummyGame implements IGameLogic {
 		//center = new BoundingBox2D(player.getCenterPoint(), new Vector2D(1,1));
 		
 		
-		dummy = new GameObject2D();
 		
-		slime = new GameObject2D();
+		
+		slime = new Slime();
+		
+		for (int i = 0; i < 140; i++) {
+			slimeList.add(new Slime());
+		}
 		
 	/*	wall = new WallTile();
 		wall.AddFrame(spriteLoader.GetAnim("wall"));
@@ -90,13 +99,10 @@ public class DummyGame implements IGameLogic {
 		
 		
 
-		slime.AddFrame(spriteLoader.GetAnim("bsIdle"));
-		slime.SetPosition(20,20);
+		/*slime.AddFrame(spriteLoader.GetAnim("bsIdle"));
+		slime.SetPosition(20,20);*/
 		
-		dummy.AddFrame(spriteLoader.GetAnim("pIdleD"));
-		
-		dummy.SetPosition(70, 50);
-
+	
 		/*player.AddFrame(idleD);
 		player.AddFrame(frameRunRight);
 		player.AddFrame(frameRunLeft);
@@ -117,7 +123,7 @@ public class DummyGame implements IGameLogic {
 
 		// Create a background texture
 		Texture2D background = new Texture2D();
-		background.CreateTexture("textures2/ceilings.png");
+		background.CreateTexture("textures2/ceilings.png", false);
 /*
 		// Create a cloud layer
 		Texture2D clouds = new Texture2D();
@@ -157,8 +163,16 @@ public class DummyGame implements IGameLogic {
 		
 		
 		entityLayer.AddGameObject(player);
-		entityLayer.AddGameObject(dummy);
 		entityLayer.AddGameObject(slime);
+		
+		for (Slime s : slimeList) {
+			entityLayer.AddGameObject(s);
+			
+			Vector2D tilePos = map.GetSlimeSpawn();
+			if(tilePos.x == 0 && tilePos.y == 0)
+				break;
+			s.SetPosition(tilePos.add(new Vector2D(8,8)));
+		}
 		
 		//entityLayer.AddGameObject(wall);
 		
@@ -186,6 +200,9 @@ public class DummyGame implements IGameLogic {
 		player.SetPosition(tilePos.add(new Vector2D(8,8)));
 		player.setCenterPoint(tilePos.add(new Vector2D(8,8)));
 		
+		slime.SetPosition(tilePos.add(new Vector2D(28,8)));
+		slime.setCenterPoint(tilePos.add(new Vector2D(28,8)));
+		
 		//renderer.projectionMatrix.translate(tilePos.x , tilePos.y, 0);
 		//renderer.projectionMatrix.setTranslation(tilePos.x, tilePos.y, 1);
 		/*Matrix4f m = new Matrix4f();
@@ -204,6 +221,8 @@ public class DummyGame implements IGameLogic {
 		// Register scene at the manager
 		sceneManager.RegisterScene(scene);
 		
+		collectorTimer.init();
+		
 	}
 
 	@Override
@@ -217,9 +236,37 @@ public class DummyGame implements IGameLogic {
 		//int distance = (int)Vector2D.distance(player.getCenterPoint(),player.GetPosition());
 		//System.out.println(distance);
 		
-		ArrayList<FloorTile> adjacentFloors = new ArrayList<FloorTile>();
+		//ArrayList<FloorTile> adjacentFloors = new ArrayList<FloorTile>();
 		
 		player.SetCurrentFrame(0);
+		slime.SetCurrentFrame(0);
+		
+		for (Slime slime : slimeList) {
+			slime.SetCurrentFrame(0);
+			
+			float distanceFromSlime = (Vector2D.distance(slime.GetPosition(), player.GetPosition()));
+			
+			if(distanceFromSlime < 100 && distanceFromSlime > 5 && map.isInSight(new Vector2D(slime.GetPosition().x,slime.GetPosition().y + 10), new Vector2D(player.GetPosition().x,player.GetPosition().y + 10))) {
+				slime.MoveTowards(player.GetPosition());
+				if(slime.hitBox.CheckOverlapping(player.swordBoxD) && direction != "W" && isAttacking) {
+					slime.dead = true;
+				}
+			}
+			
+			
+		}
+		
+		if (window.isKeyPressed('K')) {
+			slime.dead = true;
+		}
+		
+		float distanceFromSlime = (Vector2D.distance(slime.GetPosition(), player.GetPosition()));
+		
+		if(distanceFromSlime < 100 && distanceFromSlime > 5 && map.isInSight(new Vector2D(slime.GetPosition().x,slime.GetPosition().y + 10), new Vector2D(player.GetPosition().x,player.GetPosition().y + 10))) {
+			slime.MoveTowards(player.GetPosition());
+		}
+	
+		
 		if (window.isKeyPressed('S')) {
 			direction = "S";
 			
@@ -345,15 +392,31 @@ public class DummyGame implements IGameLogic {
 		
 		
 		if(window.isKeyPressed(' ') && a) {
-			//player.SetCurrentFrame(5);
+			isAttacking = true;
+			
+			switch (direction) {
+			case "W":
+				player.SetCurrentFrame(11);
+				break;
+			case "S":
+				player.SetCurrentFrame(5);
+				break;
+			case "A":
+				player.SetCurrentFrame(9);
+				break;
+			case "D":
+				player.SetCurrentFrame(10);
+				break;
+			}
+			
 			//System.out.println(renderer.projectionMatrix);
-			a = false;
-			map.GenerateMap();
-			map.DrawToLayer(mapLayer, entityLayer, ceilingLayer);
+			//a = false;
+			/*map.GenerateMap();
+			map.DrawToLayer(mapLayer, entityLayer, ceilingLayer);*/
 		}
 
 		if(window.isKeyReleased(' ')) {
-			a = true;
+			isAttacking = false;
 		}
 		
 		if(window.isKeyPressed(GLFW_KEY_KP_ADD)) {
@@ -369,14 +432,29 @@ public class DummyGame implements IGameLogic {
 			System.out.println( player.GetPosition().toString() );
 			
 		}
+		
+		
+		if(window.isKeyPressed(GLFW_KEY_UP)) {
+			renderer.projectionMatrix.translate(0, 15, 0);
+		}else if(window.isKeyPressed(GLFW_KEY_DOWN)) {
+			renderer.projectionMatrix.translate(0, -15, 0);
+		}else if(window.isKeyPressed(GLFW_KEY_LEFT)) {
+			renderer.projectionMatrix.translate(15, 0, 0);
+		}else if (window.isKeyPressed(GLFW_KEY_RIGHT)) {
+			renderer.projectionMatrix.translate(-15, 0, 0);
+		}
 	
-		map.updateFloors(mapLayer);
+		//map.updateFloors(mapLayer);
 		
 	}
 
 	@Override
 	public void update(float interval) {
-	
+		collectorElapsedSeconds += collectorTimer.getElapsedTime();
+        if(collectorElapsedSeconds > 1) {
+            collectorElapsedSeconds = 0;
+            System.gc();
+        }
 	}
 
 	@Override
@@ -391,6 +469,5 @@ public class DummyGame implements IGameLogic {
 	public void cleanup() {
 		renderer.cleanup();
 		player.cleanUp();
-		dummy.cleanUp();
 	}
 }

@@ -49,6 +49,7 @@ public class MapGen {
 	
 	public ArrayList<FloorTile> floors = new ArrayList<FloorTile>();
 	static ArrayList<Line> lines = new ArrayList<Line>();
+	public LinkedList<Vector2D> spawnPoints = new LinkedList<Vector2D>();
 	
 	int[][] map;
 	int[][] borderedMap;
@@ -101,6 +102,7 @@ public class MapGen {
 		if(useRandomSeed)
 			seed = "" + s;
 		
+		System.out.println(seed);
 		Random r = new Random(seed.hashCode());
 		
 		for (int x = 0; x < width; x++) {
@@ -177,7 +179,7 @@ public class MapGen {
 	
 	void ProcessMap() {
 		ArrayList<ArrayList<Coord>> wallRegions = GetRegions(1);
-		int wallThresholdSize = 5;
+		int wallThresholdSize = 10;
 		
 		for (ArrayList<Coord> region : wallRegions) {
 			if(region.size() < wallThresholdSize) {
@@ -202,9 +204,18 @@ public class MapGen {
 		}
 		
 		roomsLeft.sort(null);
-	  /*for (Room room : roomsLeft) {
-			System.out.println(room.roomSize);
-		}*/
+		for (Room room : roomsLeft) {
+			//System.out.println(room.roomSize);
+			
+			Random r = new Random();
+			for(Coord cTile : room.centralTiles) {
+				if(r.nextInt() % 20 == 0) {
+					spawnPoints.add(cTile.toVec2D());
+				}
+			}
+			
+			
+		}
 		
 		roomsLeft.get(0).isMainRoom = true;
 		roomsLeft.get(0).isAccessibleFromMainRoom = true;
@@ -500,12 +511,32 @@ public class MapGen {
 		
 	}
 	
+	public Vector2D GetSlimeSpawn() {
+		if(spawnPoints.isEmpty()) {
+			return new Vector2D(0,0);
+		}
+		return spawnPoints.remove();
+	}
+	
 	public boolean isFloor(Vector2D pos) {
 		if(map[ (int) pos.x/16 ][ (int) pos.y/16 ] == 0) {
 			return true;
 		}else {
 			return false;
 		}
+	}
+	
+	public boolean isInSight(Vector2D posA,Vector2D posB ) {
+		
+		ArrayList<Coord> tilesBetweenObjs = GetLineCoords(new Coord(posA),new Coord(posB));
+		
+		for (Coord coord : tilesBetweenObjs) {
+			if(map[coord.tileX][coord.tileY] == 1){
+				return false;
+			}
+		}
+		
+		return true;
 	}
 	
 	public void updateFloors(C2DGraphicsLayer floorLayer) {
@@ -527,6 +558,11 @@ public class MapGen {
 		public Coord() {
 		}
 		
+		public Coord(Vector2D pos) {
+			this.tileX = (int) (pos.x/16);
+			this.tileY = (int) (pos.y/16);
+		}
+		
 		public Vector2D toVec2D() {
 			return new Vector2D((tileX * 16), (tileY * 16));
 		}
@@ -546,6 +582,7 @@ public class MapGen {
 	public static class Room implements Comparable<Room>{
 		public ArrayList<Coord> tiles;
 		public ArrayList<Coord> edgeTiles;
+		public ArrayList<Coord> centralTiles;
 		public ArrayList<Room> connectedRooms;
 		public int roomSize;
 		public boolean isAccessibleFromMainRoom;
@@ -560,7 +597,8 @@ public class MapGen {
 			roomSize = tiles.size();
 			connectedRooms = new ArrayList<Room>();
 			
-			edgeTiles = new ArrayList<MapGen.Coord>();
+			
+			edgeTiles = new ArrayList<Coord>();
 			for (Coord tile : tiles) {
 				for(int x = tile.tileX - 1; x <= tile.tileX + 1; x++) {
 					for(int y = tile.tileY - 1; y <= tile.tileY + 1; y++) {
@@ -571,6 +609,18 @@ public class MapGen {
 						}
 					}					
 				}
+			}
+			
+			centralTiles = new ArrayList<MapGen.Coord>();
+			for(Coord tile : tiles) {
+				boolean isEdge = false;
+				for(Coord edgeTile : edgeTiles) {
+					if(tile.tileX == edgeTile.tileX && tile.tileY == edgeTile.tileY) {
+						isEdge = true;
+					}
+				}
+				if(!isEdge)
+					centralTiles.add(tile);
 			}
 			
 		}
